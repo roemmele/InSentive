@@ -1,0 +1,144 @@
+.title {
+    color: #9b4dca;
+    margin-bottom: 5px;
+    /*    display:inline-block;*/
+}
+
+.item-title {
+    margin-bottom: 3px;
+}
+
+.instructions-paragraph {
+    margin-bottom: 15px;
+}
+
+.prompt-text {
+    margin-bottom: 5px;
+    padding: 5px;
+    border: 1px dotted;
+    border-color: #9b4dca;
+}
+
+.emphatic-text {
+    font-weight: bold;
+    color: #9b4dca;
+}
+
+.example-sentence {
+    font-family: "Courier New";
+}
+
+.story {
+    border: 1px dotted;
+    padding: 3px;
+}
+
+.sentence-label {
+    font-size: 0.9em;
+    font-weight: bold;
+    color: #9b4dca;
+    padding-bottom: 1px;
+}
+
+.input-string {
+    margin-bottom: 2px;
+}
+
+.examples-label {
+    font-size: 0.75em;
+    font-weight: bold;
+    color: #9b4dca;
+    padding-bottom: 0px;
+    margin-top: 1px;
+}
+
+.sentence-box {
+    margin-top: 15px;
+}
+
+.sentence-box-textarea {
+    min-height: 5.6rem;
+    margin-top: 5px;
+    margin-bottom: 0px;
+}
+
+.sentence-box-group {
+    line-height: 1rem;
+}
+
+.computer-text {
+    font-family: "Courier New";
+}
+
+.error-text {
+    margin-top: 0px;
+    font-size: 0.25rem;
+    font-weight: bold;
+}
+
+.proceed-button {
+    margin-top: 1px;
+}
+
+/*#examples-label {
+    font-weight: bold;
+    text-decoration: underline;
+}*/
+
+.sents-group {
+    margin-top: 1px;
+    margin-bottom: 1px;
+    border: 1px dotted;
+    padding: 5px;
+}
+
+#page {
+    max-width: 105rem;
+    margin-top: 1%;
+}
+
+#instructions-examples {
+    font-size: 0.85em;
+    border: 1px dotted;
+    padding: 5px;
+    margin-bottom: 10px;
+}
+
+.App {
+    text-align: center;
+}
+
+.App-logo {
+    height: 40vmin;
+    pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .App-logo {
+        animation: App-logo-spin infinite 20s linear;
+    }
+}
+
+.App-header {
+    background-color: #282c34;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: calc(10px + 2vmin);
+    color: white;
+}
+
+.App-link {
+    color: #61dafb;
+}
+
+@keyframes App-logo-spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
