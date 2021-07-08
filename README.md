@@ -12,7 +12,7 @@ This repo contains three main components related to these experiments.
 
 Install the dependencies in requirements.txt to run any of this code: "pip install -r requirements.txt"
 
-## #1: InSentive
+## 1. InSentive Model
 
 The task of sentence infilling (also called expansion or elaboration) takes a text as input and expands the text to include new tokens in addition to the input tokens. These new tokens can be inserted ("infilled") anywhere among the input tokens.
 
@@ -22,7 +22,7 @@ The models I've developed for infilling make use of [texgen library](https://git
 
 #### Automated Data Creation
 
-My main experiments involved artifically generating expansion datasets by automatically removing tokens from sentences in existing text datasets, which results in aligned pairs of token lists and corresponding infilled texts that contain those tokens. The script here for performing this process is make_dataset.py. This script takes a set of texts as input, segments them into sentences (if not already segmented), and then drops tokens in the sentences via random sampling. The result is a new dataset of source-target pairs where the source sentences are the one with the removed tokens and the target sentences are the original sentences. There are two methods for performing token dropping: the baseline I simply call "random", and then there is also a "syntax" method. The first method simply randomly drops tokens from sentences without regard to syntax. The second method is a syntax-aware method that prunes tokens from a tree such that when a token is dropped (tokens are also selected here by random sampling), all of its dependent tokens in its dependency parse are also dropped. Both these methods have parameters that I set according to informal qualitative evaluation, such as how aggressively to perform dropping, and adding constraints like requiring a certain proportion of semantic content words to grammatical function words in the output sentences. Take a look at the syntax_drop_spacy_sentence() and random_drop_spacy_sentence() to see how these parameters are applied. When running make_dataset.py you can specify applying only one drop method, or indicate both drop methods should be applied, which will randomly alternate between the two while iterating through sentences. See `python make_dataset.py -h` for a description of all arguments that can be specified when running this script.
+My experiments involved artifically generating expansion datasets by automatically removing tokens from sentences in existing text datasets, which results in aligned pairs of token lists and corresponding infilled texts that contain those tokens. The script here for performing this process is make_dataset.py. This script takes a set of texts as input, segments them into sentences (if not already segmented), and then drops tokens in the sentences via random sampling. The result is a new dataset of source-target pairs where the source sentences are the one with the removed tokens and the target sentences are the original sentences. There are two methods for performing token dropping: the baseline I simply call "random", and then there is also a "syntax" method. The first method simply randomly drops tokens from sentences without regard to syntax. The second method is a syntax-aware method that prunes tokens from a tree such that when a token is dropped (tokens are also selected here by random sampling), all of its dependent tokens in its dependency parse are also dropped. Both these methods have parameters that I set according to informal qualitative evaluation, such as how aggressively to perform dropping, and adding constraints like requiring a certain proportion of semantic content words to grammatical function words in the output sentences. Take a look at the syntax_drop_spacy_sentence() and random_drop_spacy_sentence() to see how these parameters are applied. When running make_dataset.py you can specify applying only one drop method, or indicate both drop methods should be applied, which will randomly alternate between the two while iterating through sentences. See `python make_dataset.py -h` for a description of all arguments that can be specified when running this script.
 
 ##### Example
 
@@ -68,10 +68,10 @@ python generation_script.py -src_texts_file toy_data/elab_pairs/sents.src -model
 
 The model trained on infilled sentences from 10,000 fiction books can be downloaded here: X. Supply this directory as the -model_dir argument in the command above and you can produce infilled sentences for any token sequences.
 
-### 2. Demo
+## 2. InSentive Web Demo
 
 The above trained model is running in a web demo app that produces infilled sentences for any user-provided text. The code for this app (React front-end, Flask back-end) is here in the demo-app directory. You can try out the demo for yourself here at X, or run it locally on your own machine.
 
-## 3. Human Authoring Task
+## 3. InSentive Human Authoring Experiment
 
-Coming soon.
+Description coming soon.

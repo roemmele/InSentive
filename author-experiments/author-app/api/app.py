@@ -9,15 +9,15 @@ from flask import Flask, request, session
 
 spacy_model = spacy.load('en')
 
-eval_input_items_dir = "/home/mroemmele/elaboration/eval_items/bookcorpus_test_no_quotes/input_items/PG_input_items_added_filter/"
+eval_input_items_dir = "../input_data/prompts/"
 input_items_filenames = {'easy': os.path.join(eval_input_items_dir, "easy.txt"),
                          "hard": os.path.join(eval_input_items_dir, "hard.txt")}
 
-eval_gen_sents_dir = "/home/mroemmele/elaboration/eval_items/bookcorpus_test_no_quotes/generated/PG_input_items_added_filter/"
+eval_gen_sents_dir = "../input_data/gen_examples"
 gen_sents_filenames = {"easy": os.path.join(eval_gen_sents_dir, "easy.txt"),
                        "hard": os.path.join(eval_gen_sents_dir, "hard.txt")}
 
-user_output_dir = "/home/mroemmele/elaboration/eval_items/bookcorpus_test_no_quotes/user_outputs/PG_input_items_added_filter"
+user_output_dir = "../user_output"
 
 
 def validate_outputs(output_texts, input_tokens, example_output_texts=None,
@@ -128,7 +128,7 @@ min_user_sent_length = 7
 max_user_sent_length = 50
 
 show_gen_stories = True
-use_profanity_filter = True
+use_profanity_filter = False
 gen_pipeline = None
 
 if show_gen_stories:
@@ -139,10 +139,10 @@ if show_gen_stories:
 min_story_length = 75
 max_story_length = 75
 
-if use_profanity_filter:
-    with open("/home/mroemmele/elaboration/profanity_list.txt") as f:
-        profane_wordset = set([word.strip() for word in f])
-    print("Loaded profanity filter")
+# if use_profanity_filter:
+#     with open("profanity_list.txt") as f:
+#         profane_wordset = set([word.strip() for word in f])
+#     print("Loaded profanity filter")
 
 app = Flask(__name__)
 app.secret_key = 'supersecret'
@@ -151,8 +151,6 @@ print("App ready!")
 
 @app.route('/index', methods=['GET'])
 def index():
-    # import pdb
-    # pdb.set_trace()
     session['session_id'] = uuid.uuid4()
     sampled_item_ids = random.sample(range(len(all_input_items)),
                                      unique_items_per_sess)
@@ -163,7 +161,6 @@ def index():
         sampled_item_ids = sampled_item_ids * 2
     else:  # if not experimental task, always show example generated sentences
         session['show_gen_sents'] = [show_example_gen_sents] * unique_items_per_sess
-        # random.shuffle(session['show_gen_sents'])
 
     session['item_ids'] = sampled_item_ids
 
@@ -178,8 +175,6 @@ def index():
 
 @app.route('/retrieve_item', methods=['GET'])
 def get_input_item():
-    # import pdb
-    # pdb.set_trace()
     session['cur_item_idx'] += 1
     if session['cur_item_idx'] == len(session['item_ids']):
         print("All items in session completed!")
@@ -201,7 +196,6 @@ def get_input_item():
                 'gen_sents': gen_sents,
                 'input_token_char_idxs': input_token_char_idxs,
                 'show_gen_sents': show_gen_sents}
-    # print(response)
     session['start_time'] = time.time()
     return response
 
@@ -209,7 +203,6 @@ def get_input_item():
 @app.route('/submit_item', methods=['POST'])
 def try_submit_item():
     # First ensure user data is valid
-    #item_num = request.json['itemNum']
     user_sents = request.json['userSentences']
 
     item_id = session['item_ids'][session['cur_item_idx']]
@@ -262,15 +255,13 @@ def try_submit_item():
 @app.route('/generate_stories', methods=['POST'])
 def generate_stories():
     sents = request.json['userSentences']
-    # import pdb
-    # pdb.set_trace()
+
     # To ensure text is not cut off mid-sentence, truncate story to include all but final sentence
     # Returned story will contain only text after initial sentence
     item_id = session['item_ids'][session['cur_item_idx']]
     input_tokens = all_input_items[item_id]['input_tokens']
 
     stories = []
-    # for sent, output_item in zip(sents, output):
     for sent in sents:
         acceptable = False
         max_attempts = 3
@@ -282,10 +273,11 @@ def generate_stories():
                                  do_sample=True,
                                  top_p=0.7,
                                  top_k=0)[0]['generated_text'][len(sent):]
-            if len(set(word_tokenize(story)).intersection(profane_wordset)) == 0:
-                acceptable = True
-            else:
-                print("detected profane on attempt {}: {}".format(attempt_num, story))
+            if use_profanity_filter:
+                if len(set(word_tokenize(story)).intersection(profane_wordset)) == 0:
+                    acceptable = True
+                else:
+                    print("detected profane on attempt {}: {}".format(attempt_num, story))
             attempt_num += 1
 
         if not acceptable:

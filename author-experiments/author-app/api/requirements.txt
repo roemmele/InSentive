@@ -1,0 +1,4 @@
+nltk
+Flask
+spacy
+transformers
