@@ -8,15 +8,15 @@ This repo contains three main components related to these experiments.
 
 1. The code for the InSentive model, including the process for creating a dataset to train this model. We also provide a link to download our trained model itself.
 2. The code for a web demo that showcases the automated model. You can also view this demo online at the link given below.
-3. The code for the human authoring task. This includes the web application used to conduct the human authoring task, as well as scripts our experiments used to analyze the resulting data. The data we collected, which contains human-authored sentences aligned with generated sentences, is available by request if you email me at mroemmele@sdl.com.
+3. The code for the human authoring task. This includes the web application used to conduct the human authoring task, the [data](https://github.com/roemmele/InSentive/tree/main/author-experiments/result-data) resulting from the task (human-authored sentences aligned with generated sentences), as well as scripts our experiments used to analyze the resulting data.
 
-Install the dependencies in requirements.txt to run any of this code: "pip install -r requirements.txt"
+Install the dependencies in requirements.txt to run the code: "pip install -r requirements.txt"
 
 ## 1. InSentive Model
 
 The task of sentence infilling (also called expansion or elaboration) takes a text as input and expands the text to include new tokens in addition to the input tokens. These new tokens can be inserted ("infilled") anywhere among the input tokens.
 
-The models I've developed for infilling make use of [texgen library](https://github.com/roemmele/texgen). You will need to install this library in order to run any code in this (insentivize) repo ("pip install git+https://github.com/roemmele/texgen.git"; also defined in requirements.txt). See the documentation in the texgen repo for details about the model code itself. This README goes through the steps I used to automatically create a dataset for infilling, train a model on this dataset, and apply the trained model to generate infilled texts.
+The models I've developed for infilling make use of [texgen library](https://github.com/roemmele/texgen). You will need to install this library in order to run any code in this repo ("pip install git+https://github.com/roemmele/texgen.git"; also defined in requirements.txt). See the documentation in the texgen repo for details about the model code itself. This README goes through the steps I used to automatically create a dataset for infilling, train a model on this dataset, and apply the trained model to generate infilled texts.
 
 ### Data
 
@@ -36,10 +36,10 @@ This will produce the files sents.src and sents.tgt in the -output_data_dir dire
 
 ##### BookCorpus Infilling Dataset
 
-My experiments with sentence infilling made use of the BookCorpus dataset, which consists mostly of fiction books. I obtained this data through the [https://github.com/soskek/bookcorpus](Homemade BookCorpus repo), and selected a subset of 10,000 files (books). I ran the data_creation/make_dataset.py script on these files to generate infilling pairs. I used only the "random" method described above for deriving source texts. I also filtered pairs where the original target sentence was shorter than 10 tokens, and I converted all tokens in the source (but not the target) to lowercase. Below is the command that replicates this (cd to data_creation/). This dataset was used to train the model running in the demo described below.
+My experiments with sentence infilling made use of the BookCorpus dataset, which consists mostly of fiction books. I obtained this data through the [Homemade BookCorpus repo](https://github.com/soskek/bookcorpus), and selected a subset of 10,000 files (one book per file). I ran the data_creation/make_dataset.py script on these files to generate infilling pairs. I used only the "random" method described above for deriving source texts. I also filtered pairs where the original target sentence was shorter than 10 tokens, and I converted all tokens in the source (but not the target) to lowercase. Below is the command that replicates this (cd to data_creation/). This dataset was used to train the model running in the demo described below.
 
 ```
-python make_dataset.py -data_dir [PATH/TO/INPUT/FILES/DIRECTORY] -output_data_dir [PATH/TO/OUTPUT/PAIRS/DIRECTORY] -drop_method random -min_tgt_length 10 -min_drop_rate 0.6 -min_open_class_prop 0.5 -lowercase_src -batch_size 1000
+python make_dataset.py -data_dir [PATH/TO/INPUT/FILES/DIRECTORY] -output_data_dir [PATH/WHERE/OUTPUT/PAIRS/WILL/BE/SAVED] -drop_method random -min_tgt_length 10 -min_drop_rate 0.6 -min_open_class_prop 0.5 -lowercase_src -batch_size 1000
 ```
 
 ### Training
@@ -53,7 +53,7 @@ python train_script.py -train_src_file toy_data/elab_pairs/sents.src -train_tgt_
 Here are the specific arguments I used to train a model on the BookCorpus infilling pairs dataset (described above). The architecture/hyperparameters for this model are the same ones defined in test/test_configs/gpt2_lm_config.json.
 
 ```
-python train_script.py -train_src_file [PATH/TO/TRAIN/SOURCE/TEXTS] -train_tgt_file [PATH/TO/TRAIN/TARGET/TEXTS] -eval_src_file [PATH/TO/VALIDATION/SOURCE/TEXTS] -eval_tgt_file [PATH/TO/VALIDATION/TARGET/TEXTS] -save_dir [PATH/TO/MODEL/DIRECTORY] -patience 25 -max_epochs 100 -config_file test/test_configs/gpt2_lm_config.json -max_grad_norm 1.0 -batch_size 32  -accum_steps 8 -valid_iterations 25000
+python train_script.py -train_src_file [PATH/TO/TRAIN/SOURCE/TEXTS] -train_tgt_file [PATH/TO/TRAIN/TARGET/TEXTS] -eval_src_file [PATH/TO/VALIDATION/SOURCE/TEXTS] -eval_tgt_file [PATH/TO/VALIDATION/TARGET/TEXTS] -save_dir [PATH/WHERE/MODEL/WILL/BE/SAVED] -patience 25 -max_epochs 100 -config_file test/test_configs/gpt2_lm_config.json -max_grad_norm 1.0 -batch_size 32  -accum_steps 8 -valid_iterations 25000
 ```
 
 ### Generation
@@ -66,12 +66,21 @@ python generation_script.py -src_texts_file toy_data/elab_pairs/sents.src -model
 
 ### Trained BookCorpus Infilling Model
 
-The model trained on infilled sentences from 10,000 fiction books can be downloaded here: X. Supply this directory as the -model_dir argument in the command above and you can produce infilled sentences for any token sequences.
+The model trained on infilled sentences from 10,000 fiction books (bookcorpus_10K_rand_drop.tar.gz) can be downloaded [here](https://drive.google.com/file/d/18E8IT__33bU24Nqws-9amY_obHZ0jVNG/view?usp=sharing). Uncompress this directory and supply it as the -model_dir argument in the command above to generate infilled sentences.
 
 ## 2. InSentive Web Demo
 
-The above trained model is running in a web demo app that produces infilled sentences for any user-provided text. The code for this app (React front-end, Flask back-end) is here in the demo-app directory. You can try out the demo for yourself here at X, or run it locally on your own machine.
+The above trained model is running in a web demo app that produces infilled sentences for any user-provided text. The code for this app (React front-end, Flask back-end) is here in the demo-app directory. You can try out the demo hosted at https://roemmele.github.io/InSentive, or run it locally on your own machine; see the instructions inside demo-app.
 
 ## 3. InSentive Human Authoring Experiment
 
-Description coming soon.
+The directory author-experiments/ contains the app used to conduct the human authoring task, as well as resulting data from authors on Amazon Mechanical Turk and the code used to report the analyses in the paper. If you're only interested in the dataset, everything you need is in https://github.com/roemmele/InSentive/tree/main/author-experiments/result-data; see the README.md there for explanation. If you use the data for your own research, please cite the paper:
+
+```
+@inproceedings{roemmele2021,
+  title={Inspiration through Observation: Demonstrating the Influence of Automatically Generated Text on Creative Writing},
+  author={Roemmele, Melissa},
+  booktitle={12th International Conference on Computational Creativity},
+  year={2021},
+}
+```
