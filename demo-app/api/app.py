@@ -1,9 +1,6 @@
 import os
 import sys
-# root_dir = os.path.realpath("../../../")
-# sys.path.insert(0, root_dir)
-# texgen_dir = os.path.realpath("../../../texgen_library")
-# sys.path.insert(0, texgen_dir)
+import argparse
 
 from flask import Flask, request
 
@@ -20,32 +17,14 @@ import logging
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
-
 app = Flask(__name__)
-
-
-def load_models():
-
-    tokenizer = load_tokenizer('gpt2-small')
-
-    generic_model, _ = load_model(load_dir='/home/mroemmele/elaboration/trained_models/books_10K_rand_drop')
-    generic_model.eval()
-
-    financial_model, _ = load_model(load_dir='/home/mroemmele/elaboration/trained_models/lse_stock_reports_unshuffled')
-    financial_model.eval()
-
-    models = {'generic': generic_model, 'financial': financial_model}
-
-    logger.info("Done initializing")
-    return tokenizer, models
-
-tokenizer, models = load_models()
 
 
 @app.route('/expand', methods=['POST'])
 def get_expansions():
-    model_type = request.json['model_type']
-    model = models[model_type]
+    model = app.config['model']
+    tokenizer = app.config['tokenizer']
+
     input_text = request.json['input'].strip().lower()
     input_tokens = [token.text for token in encode_into_spacy(input_text)]
     print("input tokens:", input_tokens)
@@ -61,8 +40,8 @@ def get_expansions():
     sample_p = 0.7
     max_redund_rate = 0.9
 
-    print("Using model type = {}, sample decoding with p={}, min length={}, max_length={}".format(
-        model_type, sample_p, min_gen_length, max_gen_length))
+    print("Using sample decoding with p={}, min length={}, max_length={}".format(
+        sample_p, min_gen_length, max_gen_length))
 
     while len(gen_output) < max_returned_texts and gen_attempt <= max_gen_attempts:
 
@@ -114,3 +93,26 @@ def get_expansions():
 
     logger.info("Returning {} sentences".format(len(gen_output)))
     return {'output': gen_output}
+
+
+def init_app(model_path):
+
+    model, model_hparams = load_model(load_dir=model_path)
+    model.eval()
+    tokenizer = load_tokenizer(model_hparams['tokenizer'])
+    print("Loaded model")
+
+    app.config['tokenizer'] = tokenizer
+    app.config['model'] = model
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--model_path", "-model_path", help="Specify directory path for infilling model",
+                        type=str, required=True)
+    parser.add_argument("--port", "-port", help="Specify port number for this server",
+                        type=int, required=False, default=5000)
+
+    args = parser.parse_args()
+    init_app(args.model_path)
+    app.run(host='0.0.0.0', port=args.port)
