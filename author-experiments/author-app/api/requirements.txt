@@ -1,4 +1,0 @@
-nltk
-Flask
-spacy
-transformers

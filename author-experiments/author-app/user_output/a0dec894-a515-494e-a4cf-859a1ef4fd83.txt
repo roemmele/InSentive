@@ -1,0 +1,2 @@
+Session_Item_Index	Item_ID	Difficulty_Level	Generated_Examples_Shown	Time_Elapsed	Input_Words	User_Sentences
+0	439	easy	False	60.903561	available in digital	It's not yet available in digital form, she told me.	It won't be available yet in a digital format until next year.

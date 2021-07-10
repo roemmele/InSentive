@@ -7,7 +7,7 @@ import spacy
 from nltk.tokenize import word_tokenize, sent_tokenize
 from flask import Flask, request, session
 
-spacy_model = spacy.load('en')
+spacy_model = spacy.load('en_core_web_sm', disable=['ner'])
 
 eval_input_items_dir = "../input_data/prompts/"
 input_items_filenames = {'easy': os.path.join(eval_input_items_dir, "easy.txt"),
@@ -120,7 +120,7 @@ def load_eval_data():
 
 print("Loading eval items...")
 all_input_items = load_eval_data()
-unique_items_per_sess = 2
+unique_items_per_sess = 5
 do_two_round_experiment = True
 show_example_gen_sents = True  # Only applicable if do_two_round_experiment == False
 
