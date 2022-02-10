@@ -2,7 +2,7 @@
 
 This repo contains code associated with the paper "Inspiration through Observation: Demonstrating the Influence of Automatically Generated Text on Creative Writing", published at the 2021 International Conference on Computational Creativity (ICCC 2021).
 
-This paper examines a particular creative writing task, sentence infilling, where the objective is to "expand" a list of words into a complete sentence. We developed a model that automatically generates infilled sentences (called "InSentive": *In*filling for *Sent*ences in the Narra*tive* Domain). We then had both this automated model and human writers produce infilled sentences for the same lists of words. In one condition, the human authors observed automatically generated sentences while authoring their own sentences. We found evidence that these automated examples helped people write more appealing sentences. See the paper for much more detail.
+This paper examines a particular creative writing task, sentence infilling, alternatively known as sentence expansion or sentence elaboration. The objective is to "expand" a list of words into a complete sentence. We developed a model that automatically generates infilled sentences (called "InSentive": *In*filling for *Sent*ences in the Narra*tive* Domain). We then had both this automated model and human writers produce infilled sentences for the same lists of words. In one condition, the human authors observed automatically generated sentences while authoring their own sentences. We found evidence that these automated examples helped people write more appealing sentences. See the paper for much more detail.
 
 This repo contains three main components related to these experiments.
 
